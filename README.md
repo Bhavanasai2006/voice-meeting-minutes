@@ -96,7 +96,7 @@ uvicorn app.main:app --reload
 
 **Quick Health Check:**
 ```bash
-curl https://voice-meeting-executor-dmqt.onrender.com//health
+curl https://voice-meeting-executor-dmqt.onrender.com/health
 ```
 
 **Expected Response:**
@@ -111,7 +111,7 @@ curl https://voice-meeting-executor-dmqt.onrender.com//health
 
 **Process a Meeting Note:**
 ```bash
-curl -X POST https://voice-meeting-executor-dmqt.onrender.com//speakspace/process \
+curl -X POST https://voice-meeting-executor-dmqt.onrender.com/speakspace/process \
   -H "Authorization: Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o" \
   -H "Content-Type: application/json" \
   -d '{
@@ -131,13 +131,27 @@ curl -X POST https://voice-meeting-executor-dmqt.onrender.com//speakspace/proces
 
 **View Created Tasks:**
 ```bash
-curl https://voice-meeting-executor-dmqt.onrender.com//tasks \
+curl https://voice-meeting-executor-dmqt.onrender.com/tasks \
   -H "Authorization: Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+```
+
+**Delete a Specific Task:**
+```bash
+curl -X DELETE https://voice-meeting-executor-dmqt.onrender.com/tasks/1 \
+  -H "Authorization: Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+```
+
+**Expected Response:**
+```json
+{
+  "status": "success",
+  "message": "Task #1 deleted successfully"
+}
 ```
 
 **Interactive Testing:**
 
-Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
+Open in browser: https://voice-meeting-executor-dmqt.onrender.com/docs
 
 1. Click any endpoint with 🔒 icon
 2. Click "Try it out"
@@ -166,7 +180,7 @@ Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
 {
   "title": "Smart Meeting Minutes",
   "description": "Extract tasks from meeting notes with AI-powered analysis",
-  "api_url": "https://voice-meeting-executor-dmqt.onrender.com//speakspace/process",
+  "api_url": "https://voice-meeting-executor-dmqt.onrender.com/speakspace/process",
   "method": "POST",
   "headers": {
     "Authorization": "Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o",
@@ -198,6 +212,7 @@ Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
 | `/process` | POST | Yes | Process meeting note (detailed response) |
 | `/tasks` | GET | Yes | View all tasks with analytics |
 | `/tasks/{note_id}` | GET | Yes | View tasks from specific note |
+| `/tasks/{task_id}` | DELETE | Yes | Delete a specific task by ID |
 | `/timeline` | GET | Yes | Task timeline visualization |
 | `/analytics` | GET | Yes | Detailed task analytics |
 | `/tasks/clear` | DELETE | Yes | Clear all tasks (testing only) |
@@ -236,6 +251,74 @@ Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
 ```
 **Expected:** High-risk tasks identified with descriptions
 
+### Test Case 4: Delete Task
+```bash
+# First, get all tasks to find task IDs
+curl https://voice-meeting-executor-dmqt.onrender.com/tasks \
+  -H "Authorization: Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+
+# Then delete a specific task (replace {task_id} with actual ID)
+curl -X DELETE https://voice-meeting-executor-dmqt.onrender.com/tasks/5 \
+  -H "Authorization: Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+```
+**Expected:** `{"status": "success", "message": "Task #5 deleted successfully"}`
+
+---
+
+## 🪟 PowerShell Commands (For Windows Users)
+
+### View All Tasks
+```powershell
+$headers = @{
+    "Content-Type" = "application/json"
+    "Authorization" = "Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+}
+
+$response = Invoke-WebRequest -Uri "https://voice-meeting-executor-dmqt.onrender.com/tasks" -Method GET -Headers $headers
+$response.Content
+```
+
+### Create Tasks
+```powershell
+$headers = @{
+    "Content-Type" = "application/json"
+    "Authorization" = "Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+}
+
+$body = @{
+    prompt = "Fix login bug and assign to Ravi by Friday. Update landing page UI and assign to Self by Monday."
+    note_id = "demo_001"
+    timestamp = "2025-12-14T10:00:00Z"
+} | ConvertTo-Json
+
+Invoke-WebRequest -Uri "https://voice-meeting-executor-dmqt.onrender.com/process" -Method POST -Headers $headers -Body $body
+```
+
+### Delete a Task
+```powershell
+$headers = @{
+    "Content-Type" = "application/json"
+    "Authorization" = "Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+}
+
+$taskId = 4  # Replace with actual task ID
+
+Invoke-WebRequest -Uri "https://voice-meeting-executor-dmqt.onrender.com/tasks/$taskId" -Method DELETE -Headers $headers
+```
+
+### View Tasks by Note ID
+```powershell
+$headers = @{
+    "Content-Type" = "application/json"
+    "Authorization" = "Bearer FxvL4FeK8VV-Fz1KvFcaCUWfklHmzh_Wkg74J3h0-2o"
+}
+
+$noteId = "demo_001"
+
+$response = Invoke-WebRequest -Uri "https://voice-meeting-executor-dmqt.onrender.com/tasks/$noteId" -Method GET -Headers $headers
+$response.Content
+```
+
 ---
 
 ## ✨ Features Implemented
@@ -255,6 +338,7 @@ Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
 13. **Cleanup Engine** - Removes filler words
 14. **Analytics Dashboard** - Task insights and statistics
 15. **Instant Preview** - Pre-creation task review
+16. **Task Management** - Individual task deletion support
 
 ---
 
@@ -276,6 +360,21 @@ Open in browser: https://voice-meeting-executor-dmqt.onrender.com//docs
 {
   "status": "success",
   "message": "3 tasks created successfully"
+}
+```
+
+### Successful Deletion
+```json
+{
+  "status": "success",
+  "message": "Task #5 deleted successfully"
+}
+```
+
+### Task Not Found (404)
+```json
+{
+  "detail": "Task #999 not found"
 }
 ```
 
@@ -322,6 +421,10 @@ See `.env.example` for complete template.
 - Verify Bearer token is correct
 - Check Authorization header format: `Bearer YOUR_TOKEN`
 
+**API returns 404 Not Found (when deleting):**
+- Verify the task ID exists by calling `/tasks` first
+- Task IDs are integers, not strings
+
 **API returns 500 Internal Server Error:**
 - Check OpenAI API key is valid
 - Verify you have OpenAI credits: https://platform.openai.com/account/billing
@@ -337,7 +440,13 @@ See `.env.example` for complete template.
 
 ---
 
+## 🎯 Task Management Workflow
 
+1. **Create tasks** - Process meeting notes via `/process` or `/speakspace/process`
+2. **View tasks** - List all tasks via `/tasks` or filter by note with `/tasks/{note_id}`
+3. **Analyze tasks** - Get insights via `/analytics` or timeline via `/timeline`
+4. **Delete tasks** - Remove individual tasks via `/tasks/{task_id}` or clear all via `/tasks/clear`
+
+---
 
 Thank you for evaluating Voice Meeting Executor!
-
