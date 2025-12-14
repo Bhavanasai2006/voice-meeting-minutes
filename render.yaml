@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: voice-meeting-executor
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: BEARER_TOKEN
+        sync: false
+      - key: STORAGE_FILE
+        value: tasks.json
+      - key: ENVIRONMENT
+        value: production
